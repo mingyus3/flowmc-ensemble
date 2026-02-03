@@ -1,0 +1,14 @@
+numpy==2.0.2
+scipy==1.16.3
+pandas
+matplotlib
+seaborn
+scikit-learn==1.6.0
+
+jax==0.7.2
+jaxlib==0.7.2
+flowMC==0.4.5
+blackjax==1.2.5
+equinox==0.13.2
+jaxtyping==0.3.3
+jaxopt==0.8.5

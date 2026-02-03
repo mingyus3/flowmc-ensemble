@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it."
+title: "Enhanced flowMC Ensemble Sampling Framework"
+authors:
+  - family-names: "Shi"
+    given-names: "Mingyu"
+date-released: "2024-01-01"
+license: "MIT"
+version: "0.1.0"
+repository-code: "https://github.com/mingyus3/flowmc-ensemble"
