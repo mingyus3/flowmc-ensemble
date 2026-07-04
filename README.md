@@ -57,3 +57,39 @@ control with the same seeds. Per-repetition seeds are recorded in
 ## License
 
 MIT (see `LICENSE`).
+
+## Revision (July 2026): mechanism-level supplementary experiments
+
+The paper was substantially revised with six sampler-free supplementary
+experiments (E1-E6) that explain the ensemble's deficit mechanistically:
+a closed-form finite-sample law for the histogram-JS floor, a sampler-free
+decomposition of the aggregation bias, an exact isolation of the tempering
+schedule, an unbiased energy-distance check, ensemble-size scaling up to
+M=20, and an audit of the reference generators (Section 5.7).
+
+Additional layout:
+
+```
+code/
+  supp_experiments.py         all supplementary experiments (E1-E6); pure
+                              NumPy/scikit-learn, CPU-only, ~2-3 minutes;
+                              writes results/*.csv (fully deterministic)
+  gen_tables.py               regenerates every LaTeX table body in
+                              paper/tables/ from data/ and results/
+  make_revision_figures.py    regenerates the four new figures
+  fix_reference_generators.py corrected Rosenbrock / ring reference
+                              generators (Section 5.7)
+results/                      CSV outputs of the supplementary experiments
+paper/                        revised paper: main.tex + tables/ + figures/
+                              (upload the whole paper/ folder to Overleaf,
+                              compile with pdfLaTeX)
+```
+
+To reproduce the supplementary experiments and rebuild tables and figures:
+
+```bash
+pip install numpy scipy scikit-learn pandas matplotlib
+python code/supp_experiments.py all
+python code/gen_tables.py
+python code/make_revision_figures.py
+```
