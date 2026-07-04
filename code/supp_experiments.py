@@ -43,8 +43,8 @@ Usage: python3 supp_experiments.py <phase> [...phases | all]
 
 import sys
 import time
-import zlib
 import os
+import zlib
 import numpy as np
 import pandas as pd
 from scipy.special import kl_div

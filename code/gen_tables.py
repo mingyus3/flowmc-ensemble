@@ -164,3 +164,31 @@ for _name, (_cols, _head) in SPECS.items():
         "\\begin{tabular}{%s}\n\\toprule\n%s\n\\midrule\n%s\n\\bottomrule\n\\end{tabular}\n"
         % (_cols, _head, _body))
 print("full tabulars written")
+
+# ---- real-posterior table (task A+B); regenerated from real_posteriors.csv ----
+try:
+    rp = pd.read_csv(f"{RES}/real_posteriors.csv")
+    _ord = ["single@2000", "single@10000", "uniform_pool", "full_ensemble"]
+    _lab = {"single@2000": "Single @2{,}000", "single@10000": "Single @10{,}000",
+            "uniform_pool": "Uniform pool", "full_ensemble": "Full ensemble"}
+    def _ms(g, k, nd=4):
+        return f"{g.loc[k,'mean']:.{nd}f} $\\pm$ {g.loc[k,'std']:.{nd}f}"
+    _rows = []
+    for _tgt, _hdr in [("blr8", "\\textbf{Bayesian logistic regression} (8-dim, 3 reps)"),
+                       ("hier", "\\textbf{Hierarchical variance model} (10-dim, 2 reps)")]:
+        _d = rp[rp.target == _tgt]
+        _g = _d.groupby("variant")[["marginal_JS", "energy_distance", "mmd2"]].agg(["mean", "std"])
+        _rows.append(f"\\multicolumn{{4}}{{l}}{{{_hdr}}} \\\\")
+        for _v in _ord:
+            _rows.append(f"\\quad {_lab[_v]} & {_ms(_g['marginal_JS'],_v)} & "
+                         f"{_ms(_g['energy_distance'],_v)} & {_ms(_g['mmd2'],_v)} \\\\")
+        if _tgt == "blr8":
+            _rows.append("\\midrule")
+    _body = "\n".join(_rows)
+    open(f"{OUT}/tab_realpost.tex", "w").write(
+        "\\begin{tabular}{lccc}\n\\toprule\nSampler & Marginal JS $\\downarrow$ & "
+        "Energy distance $\\downarrow$ & MMD$^2$ $\\downarrow$ \\\\\n\\midrule\n"
+        + _body + "\n\\bottomrule\n\\end{tabular}\n")
+    print("wrote tab_realpost.tex")
+except FileNotFoundError:
+    print("real_posteriors.csv not found; skipping real-posterior table")

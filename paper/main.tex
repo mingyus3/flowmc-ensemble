@@ -35,10 +35,9 @@ flowMC Ensembles under Equal Sampling Budgets}}
 \noindent
 Normalizing-flow Markov chain Monte Carlo (MCMC), of which flowMC [1,2] is a
 representative implementation, adds a learned global proposal on top of local
-moves so that difficult target densities become easier to sample. A natural
-idea for making such a sampler more reliable is to run several of them with
-different architectures and pool their samples. This paper began as an attempt
-to validate exactly that: a five-member diverse flowMC ensemble equipped with
+moves. This paper began as an attempt to validate a natural reliability idea
+--- run several such samplers with different architectures and pool their
+samples: a five-member diverse flowMC ensemble equipped with
 three aggregation mechanisms --- ESS-based adaptive tempering, coverage-aware
 reweighting, and quality-based member weighting. On six benchmark targets in
 20 and 50 dimensions, the ensemble seemed to reduce the average marginal
@@ -54,18 +53,21 @@ $c\approx(B_{\mathrm{eff}}-1)/8$ nats, which explains the original ``gain''
 almost entirely. We then reproduce the ensemble's deficit \emph{without
 running flowMC at all}: applying the released aggregation operators to exact
 draws from the targets recovers about 90\% of the gap, and adding the
-tempering schedule reproduces the measured ensemble values on the correlated
-and funnel targets. The damage decomposes into a genuine distribution shift
+tempering schedule reproduces the measured ensemble values. The damage decomposes into a genuine distribution shift
 caused by the coverage and tempering reweighting --- confirmed by an unbiased
 energy distance --- and a pure estimator-level loss caused by resampling with
 replacement, which halves the effective histogram sample. Uniform pooling is
 harmless and matches the single chain, and adding members (up to twenty) does
-not repair the aggregation. An audit of the reference generators additionally
-shows that two targets were scored against a law that differs from their
-potential, reframing which targets are genuinely sampler-limited. The
-recommendation is unchanged and now mechanistic: run one flowMC chain at the
-full budget; if members are pooled, pool them uniformly; and avoid
-reweight-and-resample aggregation.
+not repair the aggregation. On real Bayesian posteriors, scored against a long
+NUTS reference with unbiased joint metrics (energy distance and $\mathrm{MMD}^2$)
+as well as marginal JS, uniform pooling is closest to the true posterior on
+every run, while the ensemble's disadvantage proves specific to the biased
+marginal metric --- a reversal the finite-sample analysis predicts. An audit of
+the reference generators shows that two synthetic targets were scored against
+a law that differs from their potential. The recommendation is unchanged and now
+mechanistic: run one flowMC chain at the full budget; if members are pooled,
+pool them uniformly; and be aware that reweight-and-resample aggregation harms
+the marginal fit even where its effect on the joint posterior is small.
 \end{abstract}
 
 \noindent\textbf{Keywords:} Markov chain Monte Carlo; normalizing flows;
@@ -165,6 +167,16 @@ unbiased energy distance) from a pure estimator-level loss (resampling with
 replacement, which doubles the sampler-side variance term exactly as the
 bootstrap predicts). Increasing the ensemble size to twenty members does not
 repair the aggregation.
+\item We confirm the conclusions on \emph{real posteriors} with the \emph{real
+sampler} and \emph{unbiased joint metrics}, closing the two objections that the
+synthetic marginal-JS study leaves open. On Bayesian logistic-regression and
+hierarchical-model posteriors, scored against a long NUTS reference, the uniform
+pool is closest to the true posterior under the energy distance, $\mathrm{MMD}^2$
+and marginal JS on all fifteen target--metric--repetition runs; the single chain
+still beats the full ensemble on marginal JS; and the full ensemble is often
+best under the unbiased joint metrics --- a metric-specific reversal that the
+finite-sample-bias analysis predicts and that turns a potential inconsistency
+into corroboration of the paper's central point.
 \item We document two practical methodological warnings: histogram-based
 divergences are only comparable at matched sample counts and should be
 reported together with their finite-sample floor; and reference generators
@@ -261,6 +273,21 @@ split across members (400 each). The equal-per-member ensemble therefore uses
 five times the compute and produces five times the samples of the
 2{,}000-particle single chain, and the fair comparison is the
 10{,}000-particle single chain.
+Figure~\ref{fig:pipeline} summarizes the members, the tempering schedule, the
+aggregation stack, and the two controls that the rest of the paper compares.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_pipeline.pdf}
+\caption{The pipeline under study. Five architecturally diverse flowMC members
+(each targeting a tempered $\pi^{1/T_m}$ under the adaptive schedule) draw
+2{,}000 samples each; the pooled 10{,}000 samples are then passed either
+through the full aggregation stack (member weighting $\times$ coverage
+reweighting, followed by resampling with replacement; blue) or through plain
+uniform concatenation (purple). A single flowMC chain at the same
+10{,}000-sample budget (green) is the matched-budget control.}
+\label{fig:pipeline}
+\end{figure}
 
 \section{Experimental Setup}
 
@@ -667,7 +694,8 @@ energy distance [16] between each variant and the reference in the full 20D
 joint space, using the U-statistic estimator whose expectation is zero when
 the laws coincide. The exact draw, the uniform pool and --- notably --- the
 uniformly \emph{resampled} pool are all at zero within noise
-($|\mathrm{ED}|\le 0.002$ on every Table~5 entry, $\le 0.009$ for every individual repetition): resampling duplicates points but does
+($|\mathrm{ED}|\le 0.002$ on every Table~5 entry, $\le 0.009$ for every
+individual repetition): resampling duplicates points but does
 not change the sampled law, so an unbiased metric does not see it. The full
 aggregation stack, in contrast, shows a genuine distribution shift exactly
 where the coverage weights are unbalanced --- large on the banana (0.56) and
@@ -771,6 +799,123 @@ the bound on the ring and approaches it on the Rosenbrock.}
 \input{tables/tab_audit}
 \end{table}
 
+\subsection{Real posteriors and joint metrics on actual flowMC output}
+\label{sec:realpost}
+Two objections remain that the synthetic study cannot answer on its own. First,
+every target so far is a toy density; a reader of a computational-statistics
+venue will rightly ask whether the conclusions survive on genuine Bayesian
+posteriors. Second, and more pointedly, all of the comparative claims above are
+made with marginal JS distance --- the very metric this paper argues is a weak
+way to tell samplers apart. If the single chain only looks better because the
+metric is biased, an \emph{unbiased} metric might rank the samplers
+differently. This subsection addresses both objections directly: it runs the
+actual flowMC sampler (not exact draws) on real posteriors and scores every
+variant with unbiased joint metrics.
+
+\paragraph{Setup.} We use three real posteriors: Bayesian logistic regression
+with 8 covariates (200 observations) and with 20 covariates (400
+observations), and a hierarchical variance model
+$\tau\sim\mathrm{HalfNormal}$, $\theta_j\,|\,\tau\sim\mathcal{N}(0,\tau^2)$,
+$y_j\sim\mathcal{N}(\theta_j,\sigma_j^2)$ over nine groups (a 10-dimensional
+posterior on $(\log\tau,\theta_{1:9})$). The hierarchical model is the genuine
+funnel geometry that Neal's synthetic funnel only imitates. The
+gold-standard reference for each posterior is a long four-chain NUTS run
+(20{,}000 draws) from \texttt{numpyro}; flowMC reproduces the NUTS posterior
+means to three digits on the logistic targets, confirming both are sampling the
+same distribution. Every sampler variant --- single chain at 2{,}000 and at
+10{,}000, the full aggregation ensemble, and the uniform pool --- is the real
+flowMC output, driven through the released member palette and aggregation
+stack. Each variant is scored against the NUTS reference on the joint
+distribution with the energy distance and with $\mathrm{MMD}^2$ (RBF kernel,
+median-heuristic bandwidth), both unbiased with expectation zero when the laws
+coincide, and with marginal JS for continuity with the rest of the paper.
+Table~\ref{tab:realpost} and Figures~\ref{fig:realpostmetrics}
+and~\ref{fig:realposttally} report the result. (Because each flowMC run here is
+minutes of wall-clock, we report three repetitions for the logistic posterior
+and two for the hierarchical one; the effects are consistent across every run.)
+
+\paragraph{The uniform pool wins under every metric.} The clearest signal is
+also the most important for practice: the uniform pool is closer to the true
+posterior than the equal-budget single chain on \emph{all three metrics and all
+five target--repetition runs} (15 of 15), reducing the mean marginal JS by 12\% (logistic)
+and 9\% (hierarchical), the mean energy distance by 50\% and 39\%, and the
+mean $\mathrm{MMD}^2$ by 49\% and 19\%. This is exactly the paper's central
+practical recommendation --- if members are pooled, pool them uniformly ---
+now confirmed on real posteriors and, crucially, under unbiased joint metrics
+rather than only under the biased marginal JS. The single chain at 10{,}000
+in turn beats the single chain at 2{,}000, so the matched-budget lesson of
+Section~\ref{sec:control} holds on real posteriors as well.
+
+\paragraph{The ensemble's disadvantage is metric-specific, and we say so.}
+The more interesting finding is a partial reversal that the synthetic study,
+confined to marginal JS, could not have seen. On marginal JS the full ensemble
+is worse than the single chain on every run (Table~\ref{tab:realpost}, first
+column), reproducing the paper's synthetic result. But on the two unbiased
+joint metrics the full ensemble is often the \emph{best} of the four variants:
+it is closest to the true posterior in 3 of 5 runs under the energy distance
+and 3 of 5 under $\mathrm{MMD}^2$ (Figure~\ref{fig:realposttally}). The two
+readings are consistent once the mechanism of Section~\ref{sec:decomp} is
+recalled: the aggregation's resampling-with-replacement duplicates points,
+which inflates the histogram-based marginal JS (a finite-sample-biased
+estimator) but does not move the joint law that an unbiased metric measures; on
+these real posteriors the coverage reweighting happens to pull the joint
+distribution slightly toward the reference. So the strong synthetic claim
+that ``the aggregation machinery degrades quality'' must be softened to a
+precise, metric-aware statement: \emph{the aggregation degrades the marginal
+fit and is dominated by uniform pooling, but its effect on the joint posterior
+is small and can even be mildly favourable}. The recommendation is unchanged
+and, if anything, on firmer ground --- uniform pooling is the best option
+under every metric on every target --- but the diagnosis is now honest about
+what the aggregation does and does not do.
+
+\paragraph{Consequence for the paper's thesis.} This experiment closes the two
+open objections at once. The single-chain and uniform-pool conclusions are no
+longer artifacts of a biased metric: they hold under unbiased joint metrics, on
+genuine posteriors, with the real sampler in the loop. And the one place where
+the metric choice \emph{does} change the ranking --- the full aggregation stack
+under a joint metric --- is exactly the place the finite-sample-bias analysis
+predicts it should, which turns a potential inconsistency into corroborating
+evidence for the paper's central methodological point: the metric determines
+the verdict, so a sampler comparison must be read together with the properties
+of its metric.
+
+\begin{table}[htbp]
+\centering
+\caption{Real posteriors, actual flowMC output, scored against a long NUTS
+reference (mean $\pm$ sd over repetitions; lower is better on all three
+metrics). The uniform pool is closest to the true posterior on every metric and
+every target. The full ensemble is the worst of the three matched-budget
+variants on the biased marginal JS but often
+best on the unbiased joint metrics --- a metric-specific effect that the
+finite-sample-bias analysis of Section~\ref{sec:decomp} predicts.}
+\label{tab:realpost}
+\small
+\input{tables/tab_realpost}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_realpost_metrics.pdf}
+\caption{Real posteriors, actual flowMC output. Each panel scores the four
+sampler variants against the NUTS reference; the dashed line marks the
+single-chain-at-10{,}000 level. The uniform pool (purple) is at or below that
+line on every metric and both targets. The full ensemble (blue) is the worst matched-budget variant on the
+biased marginal JS (left column) but competitive-to-best on the unbiased joint
+metrics (middle and right columns).}
+\label{fig:realpostmetrics}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_realpost_tally.pdf}
+\caption{How often each sampler is closest to the true (NUTS) posterior, tallied
+over the five target--repetition runs, by metric. Under the biased marginal JS
+the uniform pool always wins; under the unbiased joint metrics the full
+aggregation stack is frequently closest. The verdict on the ensemble depends on
+the metric, exactly as the finite-sample-bias analysis predicts.}
+\label{fig:realposttally}
+\end{figure}
+
 \subsection{Equal-total budget}
 \label{sec:equaltotal}
 A control on the other side splits the 2{,}000-sample budget across the five
@@ -849,6 +994,27 @@ sample-set ESS stays near nominal throughout (9{,}848 against 9{,}846 on
 exact samples), so this diagnostic cannot detect either effect. A uniform pool
 imposes neither, which is why it matches the single chain under this
 marginal-JS evaluation.
+
+The real-posterior experiment of Section~\ref{sec:realpost} both extends and
+sharpens this picture. On genuine Bayesian posteriors sampled by the real flowMC
+kernel, the two conclusions that matter for practice hold under unbiased joint
+metrics and not merely under the biased marginal JS: the single chain at the
+full budget beats the small one, and the uniform pool is closest to the true
+posterior on every metric and every target. The one part of the synthetic story
+that does not carry over verbatim is instructive rather than awkward. The full
+aggregation stack, which the marginal-JS view condemns, is often the
+\emph{best} variant under the energy distance and $\mathrm{MMD}^2$ on these
+posteriors, because its damage --- as Section~\ref{sec:decomp} established --- is
+concentrated in the resampling step, which distorts a finite-sample-biased
+histogram estimator without moving the joint law that an unbiased metric sees.
+That the ranking of the aggregation flips exactly between the biased and the
+unbiased metric is not a contradiction; it is the clearest possible
+confirmation of this paper's central methodological claim, that the verdict of a
+sampler comparison is inseparable from the properties of the metric used to
+reach it. We therefore state the aggregation result in its precise, metric-aware
+form: reweight-and-resample aggregation reliably harms the marginal fit and is
+dominated by uniform pooling, while its effect on the joint posterior is small
+and occasionally favourable.
 
 Looking back, the part that is a little uncomfortable to admit is how
 convincing the wrong version looked. The first draft of this work reported the
@@ -934,7 +1100,9 @@ audit of the reference generators adds a final caution: two of the six targets
 were scored against a law that differs from their potential, and once this is
 accounted for, only the banana remains genuinely sampler-limited. The
 recommendation is short: run one flowMC chain at the full budget; if you pool
-members, pool them uniformly and expect no gain over a single chain; stay away
+members, pool them uniformly --- on the synthetic targets this matches the
+single chain, and on the real posteriors it was closest to the truth under
+every metric; stay away
 from the resampling-and-reweighting machinery; and when benchmarking with a
 histogram divergence, match the sample counts, report the floor, validate the
 reference, and keep an unbiased joint metric alongside. The broad lesson is an

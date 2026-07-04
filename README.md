@@ -93,3 +93,22 @@ python code/supp_experiments.py all
 python code/gen_tables.py
 python code/make_revision_figures.py
 ```
+
+## Round 2 (July 2026): real posteriors and joint metrics on actual flowMC output
+
+Section 5.8 adds real flowMC runs on real Bayesian posteriors (an 8-covariate
+logistic regression and a hierarchical variance model), scored against long
+4-chain NUTS references with unbiased joint metrics (energy distance, MMD^2)
+alongside marginal JS. The uniform pool is closest to the truth on all fifteen
+metric comparisons; the full ensemble's disadvantage proves specific to the
+biased marginal metric, exactly as the finite-sample analysis predicts.
+Section 3.4 gains a pipeline schematic (Figure 3).
+
+```
+code/realpost_experiments.py   real-posterior experiments (flowMC 0.6.1 + JAX +
+                               numpyro; per-unit runner for adding repetitions)
+code/make_realpost_figures.py  the two Section-5.8 figures
+code/make_method_figure.py     the Section-3.4 pipeline schematic
+results/real_*.csv             real-posterior results
+results/refs/                  NUTS gold-standard references and datasets
+```

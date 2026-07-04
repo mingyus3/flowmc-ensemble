@@ -1,0 +1,17 @@
+\begin{tabular}{lccc}
+\toprule
+Sampler & Marginal JS $\downarrow$ & Energy distance $\downarrow$ & MMD$^2$ $\downarrow$ \\
+\midrule
+\multicolumn{4}{l}{\textbf{Bayesian logistic regression} (8-dim, 3 reps)} \\
+\quad Single @2{,}000 & 0.0938 $\pm$ 0.0021 & 0.0061 $\pm$ 0.0006 & 0.0040 $\pm$ 0.0006 \\
+\quad Single @10{,}000 & 0.0587 $\pm$ 0.0017 & 0.0066 $\pm$ 0.0027 & 0.0045 $\pm$ 0.0008 \\
+\quad Uniform pool & 0.0518 $\pm$ 0.0029 & 0.0033 $\pm$ 0.0003 & 0.0023 $\pm$ 0.0014 \\
+\quad Full ensemble & 0.0717 $\pm$ 0.0015 & 0.0020 $\pm$ 0.0008 & 0.0013 $\pm$ 0.0002 \\
+\midrule
+\multicolumn{4}{l}{\textbf{Hierarchical variance model} (10-dim, 2 reps)} \\
+\quad Single @2{,}000 & 0.1200 $\pm$ 0.0063 & 0.0807 $\pm$ 0.0186 & 0.0186 $\pm$ 0.0034 \\
+\quad Single @10{,}000 & 0.0897 $\pm$ 0.0031 & 0.0907 $\pm$ 0.0166 & 0.0158 $\pm$ 0.0009 \\
+\quad Uniform pool & 0.0820 $\pm$ 0.0054 & 0.0554 $\pm$ 0.0138 & 0.0128 $\pm$ 0.0026 \\
+\quad Full ensemble & 0.0997 $\pm$ 0.0039 & 0.0722 $\pm$ 0.0098 & 0.0126 $\pm$ 0.0047 \\
+\bottomrule
+\end{tabular}
