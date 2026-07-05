@@ -11,6 +11,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 RES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "results")
+_epm = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "results_equal_per_member.csv"))
+ENS_MEAS = float(_epm[_epm.method.str.contains("ensemble", regex=False)].groupby(["potential_fn","dimension"]).JS_distance.mean().mean())
+
 FIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "paper", "figures")
 M_REF = 20000.0
 
@@ -39,11 +42,11 @@ ax.scatter([2000], [0.1038], color=C["single2k"], zorder=5, s=45,
            label="single @2,000")
 ax.scatter([10000], [0.0649], color=C["exact"], zorder=5, s=45,
            label="single @10,000")
-ax.scatter([10000], [0.0849], color=C["full"], zorder=5, s=55, marker="s",
+ax.scatter([10000], [ENS_MEAS], color=C["full"], zorder=5, s=55, marker="s",
            label="full ensemble (nominal 10,000)")
 ax.annotate("ensemble sits far above the 10k floor:\nan aggregation bias, "
             "not a sample shortage\n(measured sample-set ESS 9,848)",
-            xy=(10000, 0.0849), xytext=(1500, 0.115), fontsize=8.5,
+            xy=(10000, ENS_MEAS), xytext=(1500, 0.115), fontsize=8.5,
             color=C["full"], arrowprops=dict(arrowstyle="-", color=C["full"], lw=0.8))
 ax.set_xscale("log")
 ax.set_xticks([500, 1000, 2000, 5000, 10000, 20000])
@@ -92,9 +95,9 @@ for i, v in enumerate(m):
 ax.axhline(0.0435, ls="--", color=C["floor"], lw=1.2)
 ax.text(5.42, 0.0435, "floor @10k", fontsize=8, color=C["floor"], va="bottom",
         ha="right")
-ax.axhline(0.0849, ls=":", color=C["meas"], lw=1.6)
-ax.text(0.02, 0.0857, "flowMC ensemble, measured (0.0849)", fontsize=9,
-        color=C["meas"])
+ax.axhline(ENS_MEAS, ls=":", color=C["meas"], lw=1.6)
+ax.text(0.02, ENS_MEAS + 0.0008, "flowMC ensemble, measured (%.4f)" % ENS_MEAS,
+        fontsize=9, color=C["meas"])
 ax.axhline(0.058, ls=":", color="0.6", lw=1.0)
 ax.text(2.0, 0.0585, r"$\chi^2$ prediction for resampling (0.058)",
         fontsize=8, color="0.4")
@@ -102,7 +105,7 @@ ax.set_xticks(range(6)); ax.set_xticklabels(labels, fontsize=8.6)
 ax.set_ylabel("Mean marginal JS distance over 11 configurations")
 ax.set_ylim(0, 0.098)
 ax.set_title("Sampler-free decomposition: the aggregation operators applied to "
-             "exact samples reproduce ~90% of the ensemble's deficit",
+             "exact samples reproduce most of the ensemble's deficit",
              fontsize=10.5)
 save(fig, "fig_decomposition")
 

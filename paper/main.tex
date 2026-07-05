@@ -52,7 +52,7 @@ perfect sampler follows the closed form $\sqrt{c\,(1/N+1/M)}$ with
 $c\approx(B_{\mathrm{eff}}-1)/8$ nats, which explains the original ``gain''
 almost entirely. We then reproduce the ensemble's deficit \emph{without
 running flowMC at all}: applying the released aggregation operators to exact
-draws from the targets recovers about 90\% of the gap, and adding the
+draws from the targets recovers about 93\% of the gap, and adding the
 tempering schedule reproduces the measured ensemble values. The damage decomposes into a genuine distribution shift
 caused by the coverage and tempering reweighting --- confirmed by an unbiased
 energy distance --- and a pure estimator-level loss caused by resampling with
@@ -130,7 +130,7 @@ samples, the accuracy returns to the single-chain level. Finally --- and this
 is the part that turns the negative result into an explanation --- we removed
 flowMC itself: we applied the released aggregation operators to \emph{exact}
 draws from the targets, and the deficit reappeared almost unchanged. About
-90\% of the gap between the ensemble and the matched single chain is
+93\% of the gap between the ensemble and the matched single chain is
 reproduced by the aggregation acting on perfect samples, and adding the
 adaptive-tempering schedule reproduces the measured ensemble values on the
 correlated and funnel targets to within a few thousandths. The mechanism
@@ -321,7 +321,7 @@ one standard deviation over the repetitions.
 \label{sec:apparent}
 Against the 2{,}000-particle single chain, the equal-per-member ensemble
 lowers the marginal JS distance on all eleven configurations, by 6.8\% to
-29.2\% (mean 18.2\%), and every configuration is significant at $p<0.05$. Read
+29.7\% (mean 18.4\%), and every configuration is significant at $p<0.05$. Read
 on its own, this looks like a clear success for ensembling, and the largest
 improvements are on the multimodal and structured targets. The rest of this
 section explains why it is not what it looks like.
@@ -334,7 +334,7 @@ single chain at 10{,}000 samples, which we give in Table~\ref{tab:control} and
 Figure~\ref{fig:control}. The single 10{,}000-particle chain reaches a mean JS
 of 0.065, against 0.085 for the ensemble and 0.104 for the 2{,}000-particle
 baseline. It beats the ensemble on nine of eleven configurations, ties on the
-two banana cases (within repetition noise), with 17\% to 44\% improvements on
+two banana cases (within repetition noise), with 15\% to 44\% improvements on
 exactly those targets where the ensemble had looked strongest (bimodal,
 funnel, correlated, ring).
 
@@ -349,7 +349,7 @@ ensembling. This is a sampler-limited regime, not a sample-limited one, and
 the near-tie reflects that neither extra samples nor extra members help. So
 the banana is not a case where ensembling succeeds; it is a case where nothing
 we tried does. (The Rosenbrock and ring residuals above the floor turn out to
-have a different explanation; see Section~\ref{sec:audit}.)
+had a partly different origin; see Section~\ref{sec:audit}.)
 
 \begin{table}[htbp]
 \centering
@@ -413,7 +413,7 @@ explains why the floor is the same for every target: to leading order it does
 not depend on the underlying density at all, only on the binning and the two
 sample sizes.
 
-The 2{,}000-particle single chain sits at about 0.104 on average; on the
+The 2{,}000-particle single chain sits at about 0.102 on average; on the
 Gaussian-like targets it is already at its 2{,}000-sample floor (around
 0.086), with the mean pulled up by the banana and Rosenbrock cases
 (Section~\ref{sec:audit} examines how much of the latter is sampler error).
@@ -465,12 +465,12 @@ are measured, lines are least-squares fits through the origin.}
 We turn off each mechanism in turn (equal-per-member) and compare to the full
 ensemble. None of them gives a net benefit
 (Table~\ref{tab:ablation}, Figure~\ref{fig:ablation}). Removing coverage-aware
-reweighting improves the mean JS by 5.4\% (best on the correlated Gaussian,
+reweighting improves the mean JS by 6.1\% (best on the correlated Gaussian,
 where it improves JS by 22\% in 20D); removing adaptive tempering improves it
 by 4.3\%; removing member weighting changes it by under 1\%. The full method
 is the worst of the four ensemble variants. A homogeneous ensemble of five
-identical members performs essentially the same as the diverse one (0.0840
-versus 0.0849, a difference inside the repetition noise), so member diversity
+identical members performs essentially the same as the diverse one (0.0824
+versus 0.0833, a difference inside the repetition noise), so member diversity
 is not the active ingredient either. This was more negative than we expected
 when we designed the mechanisms, and together with Section~\ref{sec:control}
 it says clearly that neither diversity nor the aggregation machinery earns its
@@ -511,8 +511,8 @@ tempering and weighting mechanisms) with the simplest possible alternative:
 we just concatenate the five members' raw 2{,}000-sample outputs into one pool
 of 10{,}000 unique samples, with no resampling and no weights. Across all
 eleven configurations, this uniform pool matches the single 10{,}000-particle
-chain (mean JS 0.062 against 0.065) and sits far below the full ensemble
-(0.085); it matches the single chain on every target within repetition noise,
+chain (mean JS 0.060 against 0.063) and sits far below the full ensemble
+(0.083); it matches the single chain on every target within repetition noise,
 and is slightly better on the two hardest ones, the banana and the ring, where
 pooling several independent runs seems to help a little
 (Table~\ref{tab:rawpool}, Figure~\ref{fig:rawpool}). We do not over-read this
@@ -609,7 +609,7 @@ their uniform pool sit on the 10{,}000-sample floor. Resampling with
 replacement alone lifts the JS to the level predicted by doubling the
 sampler-side variance term in Equation~\eqref{eq:floor}; member weighting adds
 almost nothing on top; coverage reweighting adds the largest distortion; and
-the full stack lands within 10\% of the gap of the measured flowMC ensemble
+the full stack lands within 7\% of the gap of the measured flowMC ensemble
 (dotted line) --- without any sampler in the loop.}
 \label{fig:decomp}
 \end{figure}
@@ -632,8 +632,8 @@ out of pure noise --- a mildly cautionary detail, since a weighting scheme
 that cannot return to uniform on identical members will always inject some
 spurious imbalance. Coverage reweighting is the largest single contributor,
 lifting the mean to 0.0783, and the full stack reaches
-$0.0806\pm0.0010$, which is 90\% of the measured flowMC ensemble's deficit
-over the floor ($0.0849$). The pooled sample-set ESS, meanwhile, is blind to
+$0.0806\pm0.0010$, which is 93\% of the measured flowMC ensemble's deficit
+over the floor ($0.0833$). The pooled sample-set ESS, meanwhile, is blind to
 all of this: 9{,}846 for the uniform pool and 9{,}848 for the fully aggregated
 pool, mirroring the values observed with real flowMC members and confirming
 that this diagnostic cannot detect the damage.
@@ -780,10 +780,16 @@ reference-vs-reference quantities that do not depend on the potential at all
 first two: a divergence-to-reference benchmark is only as meaningful as the
 reference generator, and the generator should be validated against the
 potential (for instance with exactly this exact-draw test, which is two lines
-of code once the generative form exists). Scripts that regenerate corrected
-references for both targets are included in the repository [13]; we keep
-Tables~\ref{tab:control}--\ref{tab:rawpool} under the original references for
-comparability with the released per-repetition data.
+of code once the generative form exists). Following this audit we corrected both generators and reran the three
+affected configurations end to end (all budgets, ablations, and controls);
+Tables~\ref{tab:control}--\ref{tab:rawpool} report corrected-reference
+numbers throughout, and both the corrected generators and the rerun
+per-repetition data are included in the repository [13]. Under the corrected
+references every headline result is unchanged --- the matched single chain
+still wins all three configurations (by 15--32\%) --- while the ring's
+remaining residual (single chain 0.058 against a 0.044 floor) shows that,
+after the reference artefact is removed, the ring retains a modest genuinely
+sampler-limited component alongside the banana.
 
 \begin{table}[htbp]
 \centering
@@ -945,9 +951,11 @@ On a single accelerator the equal-per-member ensemble takes about five times
 the wall-clock time of the single chain, because it runs five separate flowMC
 instances. The cost of one flowMC run is dominated by its fixed training
 loops, not by the particle count: on our hardware the 10{,}000-particle chain
-runs in about 15 seconds, comparable to the 2{,}000-particle chain (about 18
+runs in about 14 seconds, comparable to the 2{,}000-particle chain (about 17
 seconds; the difference is within run-to-run variation) and roughly six times
-faster than the ensemble (about 92 seconds). The single chain therefore gets
+faster than the ensemble (about 84 seconds; the three corrected-reference
+configurations were rerun on a different accelerator, which leaves the ratios
+unchanged). The single chain therefore gets
 five times the samples at almost no extra cost, while the ensemble pays a
 fivefold cost for samples that are worse. (With five accelerators the members
 could run in parallel and the wall-clock would become comparable, but at five
@@ -987,7 +995,7 @@ coverage reweighting (and the tempering schedule, which on healthy members
 only ever sharpens the target, up to $\pi^{1.23}$) genuinely distorts the
 sampled law, which the energy distance confirms and which is worst exactly
 where the cluster structure of the first two coordinates is unbalanced.
-Applied to exact samples, the two effects reproduce about 90\% of the measured
+Applied to exact samples, the two effects reproduce about 93\% of the measured
 ensemble deficit, and with tempering included they reproduce the measured
 ensemble values on the correlated and funnel targets nearly exactly. The
 sample-set ESS stays near nominal throughout (9{,}848 against 9{,}846 on
@@ -1072,9 +1080,8 @@ tested six synthetic targets at 20 and 50 dimensions, one flow family, and
 ensemble sizes up to twenty members only in the exact-sample setting; real
 posteriors, other flows, or other aggregation designs may behave differently.
 Beyond these caveats, the extensions that would sharpen the picture most are
-evaluating joint metrics on the actual flowMC outputs, repeating the study on
-real posteriors with funnel-like or multimodal geometry, and re-running the
-Rosenbrock and ring rows against corrected references.
+evaluating joint metrics on further flowMC outputs and repeating the study on
+additional real posteriors with funnel-like or multimodal geometry.
 
 \section{Conclusion}
 We set out to validate a diversity-enhanced flowMC ensemble, and instead we
@@ -1089,7 +1096,7 @@ tying on the two banana cases --- and lowers the mean marginal JS distance by
 where the benefit went: diversity does nothing, none of the three aggregation
 heuristics helps, and replacing the aggregation with plain uniform pooling
 recovers the single-chain accuracy. Removing flowMC itself then shows why:
-applied to exact draws, the aggregation operators reproduce about 90\% of the
+applied to exact draws, the aggregation operators reproduce about 93\% of the
 deficit, and with the tempering schedule they reproduce the measured ensemble
 on the correlated and funnel targets. The damage is the sum of a genuine
 distribution shift from the coverage and tempering reweighting --- confirmed
@@ -1098,7 +1105,8 @@ with replacement, which halves the effective histogram sample; neither is
 visible to the sample-set ESS, and neither is repaired by adding members. An
 audit of the reference generators adds a final caution: two of the six targets
 were scored against a law that differs from their potential, and once this is
-accounted for, only the banana remains genuinely sampler-limited. The
+accounted for, only the banana --- and, to a smaller degree, the ring ---
+remains genuinely sampler-limited. The
 recommendation is short: run one flowMC chain at the full budget; if you pool
 members, pool them uniformly --- on the synthetic targets this matches the
 single chain, and on the real posteriors it was closest to the truth under

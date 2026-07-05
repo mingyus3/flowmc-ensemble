@@ -19,16 +19,6 @@ correlated_gaussian,20,1,2057942421,2993454883,equal_per_member,"{""no_w"": true
 correlated_gaussian,20,2,1420721546,2926745563,equal_per_member,"{""no_w"": true}"
 correlated_gaussian,20,3,471029616,987145715,equal_per_member,"{""no_w"": true}"
 correlated_gaussian,20,4,3201151998,2701160542,equal_per_member,"{""no_w"": true}"
-rosenbrock,20,0,3874231326,3819535085,equal_per_member,"{""no_w"": true}"
-rosenbrock,20,1,3988069299,453423558,equal_per_member,"{""no_w"": true}"
-rosenbrock,20,2,3853523218,2033642239,equal_per_member,"{""no_w"": true}"
-rosenbrock,20,3,1556155602,2016738972,equal_per_member,"{""no_w"": true}"
-rosenbrock,20,4,4233414937,480678009,equal_per_member,"{""no_w"": true}"
-gaussian_ring,20,0,3380744796,4255901130,equal_per_member,"{""no_w"": true}"
-gaussian_ring,20,1,262001628,1258729628,equal_per_member,"{""no_w"": true}"
-gaussian_ring,20,2,3139695050,2259314728,equal_per_member,"{""no_w"": true}"
-gaussian_ring,20,3,856599127,4026551064,equal_per_member,"{""no_w"": true}"
-gaussian_ring,20,4,2678206478,3642257436,equal_per_member,"{""no_w"": true}"
 banana,50,0,848285821,3551210255,equal_per_member,"{""no_w"": true}"
 banana,50,1,3642889520,2361304792,equal_per_member,"{""no_w"": true}"
 banana,50,2,381195948,791795861,equal_per_member,"{""no_w"": true}"
@@ -49,8 +39,18 @@ correlated_gaussian,50,1,2057942421,2993454883,equal_per_member,"{""no_w"": true
 correlated_gaussian,50,2,1420721546,2926745563,equal_per_member,"{""no_w"": true}"
 correlated_gaussian,50,3,471029616,987145715,equal_per_member,"{""no_w"": true}"
 correlated_gaussian,50,4,3201151998,2701160542,equal_per_member,"{""no_w"": true}"
-rosenbrock,50,0,3874231326,3819535085,equal_per_member,"{""no_w"": true}"
-rosenbrock,50,1,3988069299,453423558,equal_per_member,"{""no_w"": true}"
-rosenbrock,50,2,3853523218,2033642239,equal_per_member,"{""no_w"": true}"
-rosenbrock,50,3,1556155602,2016738972,equal_per_member,"{""no_w"": true}"
-rosenbrock,50,4,4233414937,480678009,equal_per_member,"{""no_w"": true}"
+rosenbrock,20,0,3874231326,3819535085,equal_per_member,{}
+rosenbrock,20,1,3988069299,453423558,equal_per_member,{}
+rosenbrock,20,2,3853523218,2033642239,equal_per_member,{}
+rosenbrock,20,3,1556155602,2016738972,equal_per_member,{}
+rosenbrock,20,4,4233414937,480678009,equal_per_member,{}
+rosenbrock,50,0,3874231326,3819535085,equal_per_member,{}
+rosenbrock,50,1,3988069299,453423558,equal_per_member,{}
+rosenbrock,50,2,3853523218,2033642239,equal_per_member,{}
+rosenbrock,50,3,1556155602,2016738972,equal_per_member,{}
+rosenbrock,50,4,4233414937,480678009,equal_per_member,{}
+gaussian_ring,20,0,3380744796,4255901130,equal_per_member,{}
+gaussian_ring,20,1,262001628,1258729628,equal_per_member,{}
+gaussian_ring,20,2,3139695050,2259314728,equal_per_member,{}
+gaussian_ring,20,3,856599127,4026551064,equal_per_member,{}
+gaussian_ring,20,4,2678206478,3642257436,equal_per_member,{}
